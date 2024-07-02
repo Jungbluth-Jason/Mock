@@ -35,15 +35,16 @@ def main():
     if strategy == "Call" or strategy == "Put":
         tv = round(float(strikes_info_2400[f"{strike}"][strategy.lower()][month]), 2)
         tau = float(strikes_info_2400[f"{strike}"]["tau"][month]) * .1
-        plus = round_to_nearest_nickel(tv + tau) if tv < 3 else round_to_nearest_dime(tv + tau)
-        minus = round_to_nearest_nickel(tv - tau) if tv < 3 else round_to_nearest_dime(tv - tau)
+        plus = round_to_up_nearest_nickel(tv + tau) if tv < 3 else round_to_up_nearest_dime(tv + tau)
+        minus = round_to_down_nearest_nickel(tv - tau) if tv < 3 else round_to_down_nearest_dime(tv - tau)
 
     elif strategy in ["Call Spread", "Put Spread"]:
         tv = round(abs(float(strikes_info_2400[f"{strike_one}"][strategy.split()[0].lower()][month]) - float(strikes_info_2400[f"{strike_two}"][strategy.split()[0].lower()][month])), 2)
+        tau = abs((float(strikes_info_2400[f"{strike_one}"]["tau"][month]) - float(strikes_info_2400[f"{strike_two}"]["tau"][month]))) * .1
         print(float(strikes_info_2400[f"{strike_one}"][strategy.split()[0].lower()][month]))
         print(float(strikes_info_2400[f"{strike_two}"][strategy.split()[0].lower()][month]))
-        plus = round_to_nearest_nickel(tv + tau)
-        minus = round_to_nearest_nickel(tv - tau)
+        plus = round_to_up_nearest_nickel(tv + tau)
+        minus = round_to_down_nearest_nickel(tv - tau)
  
     # TODO: figure out straddle rounding
     elif strategy == "Straddle":
@@ -69,11 +70,17 @@ def main():
 
 
 
-def round_to_nearest_nickel(price):
+def round_to_up_nearest_nickel(price):
     return math.ceil(price * 20) / 20
 
-def round_to_nearest_dime(price):
+def round_to_up_nearest_dime(price):
     return math.ceil(price * 10) / 10
+
+def round_to_down_nearest_nickel(price):
+    return math.floor(price * 20) / 20
+
+def round_to_down_nearest_dime(price):
+    return math.floor(price * 10) / 10
 
 if __name__ == "__main__":
     print("Price the following options: ")
