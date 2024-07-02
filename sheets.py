@@ -1,6 +1,7 @@
 import random
 import sys
 import json
+import math
 
 def main():
     strategies = ["Call", "Put", "Straddle", "Strangle", "Call Spread", "Put Spread"]
@@ -34,17 +35,17 @@ def main():
     if strategy == "Call" or strategy == "Put":
         tv = round(float(strikes_info_2400[f"{strike}"][strategy.lower()][month]), 2)
         tau = float(strikes_info_2400[f"{strike}"]["tau"][month]) * .1
-        print(tv)
-        plus = round(tv + tau, 2)
-        minus = round(tv - tau, 2)
+        plus = round_to_nearest_nickel(tv + tau) if tv < 3 else round_to_nearest_dime(tv + tau)
+        minus = round_to_nearest_nickel(tv - tau) if tv < 3 else round_to_nearest_dime(tv - tau)
 
     elif strategy in ["Call Spread", "Put Spread"]:
         tv = round(abs(float(strikes_info_2400[f"{strike_one}"][strategy.split()[0].lower()][month]) - float(strikes_info_2400[f"{strike_two}"][strategy.split()[0].lower()][month])), 2)
         print(float(strikes_info_2400[f"{strike_one}"][strategy.split()[0].lower()][month]))
         print(float(strikes_info_2400[f"{strike_two}"][strategy.split()[0].lower()][month]))
-        plus = round(tv + .1, 2)
-        minus = round(tv - .1, 2)
+        plus = round_to_nearest_nickel(tv + tau)
+        minus = round_to_nearest_nickel(tv - tau)
  
+    # TODO: figure out straddle rounding
     elif strategy == "Straddle":
         tv = round(abs(float(strikes_info_2400[f"{strike}"]["put"][month]) + float(strikes_info_2400[f"{strike}"]["call"][month])), 2)
         print(float(strikes_info_2400[f"{strike}"]["call"][month]))
@@ -65,12 +66,17 @@ def main():
     print(f"TV: {tv}")
     print(f"Spread: {minus} at {plus}")
     input()
+
+
+
+def round_to_nearest_nickel(price):
+    return math.ceil(price * 20) / 20
+
+def round_to_nearest_dime(price):
+    return math.ceil(price * 10) / 10
+
 if __name__ == "__main__":
     print("Price the following options: ")
     for i in range(10):
         main()
-
-
-
-
 
